@@ -20,7 +20,7 @@ class Bullet
   Bullet(PVector _start, PVector _target)
   {
     size = 5; 
-    speed = 1000;
+    speed = 10;
     
     pos = new PVector(_start.x, _start.y, _start.z);
     dir = new PVector(_target.x, _target.y, _target.z);

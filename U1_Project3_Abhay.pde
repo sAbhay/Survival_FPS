@@ -1,3 +1,5 @@
+import damkjer.ocd.*;
+
 PVector crosshair;
 PVector target;
 PVector start;
@@ -5,26 +7,39 @@ PVector start;
 float inaccuracy = 20;
 int cursorSize = 5;
 
-float range = 4000;
+float range = 5000;
 
 ArrayList<Bullet> b = new ArrayList<Bullet>();
 ArrayList<Enemy> e = new ArrayList<Enemy>();
+
+float sensitivity = 20;
+
+Camera camera;
 
 void setup()
 {
   fullScreen(P3D);
   noCursor();
+
+  start = new PVector(width/2, height/2, 0);
+
+  camera = new Camera(this, start.x, start.y, start.z);
+  camera.pan(PI/2);
+  camera.tilt(PI/5);
 }
 
 void draw()
 { 
+  //camera.feed();
+  
+  float d = dist(start.x, start.y, mouseX, mouseY)/sensitivity;
+
   crosshair = new PVector(mouseX, mouseY, 0);
-  target = new PVector(crosshair.x, crosshair.y, range);
-  start = new PVector(width/2, height/2 + height/3, 0);
+  target = new PVector(width - crosshair.x, height - crosshair.y, range/d);
 
   if (e.size() < 10)
   {
-    e.add(new Enemy(random(width), random(height/1.5), -range, 0, 0, random(20), random(40, 60), random(60, 80)));
+    e.add(new Enemy(random(width), random(height), -range, 0, 0, random(10), random(80, 100), random(100, 140)));
   }
 
   background(0);
@@ -50,11 +65,14 @@ void draw()
   popMatrix();
 
   noFill();
+  pushMatrix();
+  translate(0, 0, crosshair.z);
   ellipse(crosshair.x, crosshair.y, 5, 5);
   rect(crosshair.x - cursorSize/2, crosshair.y + cursorSize*2, cursorSize, inaccuracy - cursorSize);
   rect(crosshair.x - cursorSize/2, crosshair.y - inaccuracy - cursorSize, cursorSize, inaccuracy - cursorSize);
   rect(crosshair.x - inaccuracy - cursorSize, crosshair.y - cursorSize/2, inaccuracy - cursorSize, cursorSize);
   rect(crosshair.x + cursorSize*2, crosshair.y - cursorSize/2, inaccuracy - cursorSize, cursorSize);
+  popMatrix();
 
   for (int i = 0; i < b.size(); i++)
   {
@@ -66,11 +84,11 @@ void draw()
     {
       b.get(i).kill = true;
     }
-    
+
     if (b.get(i).kill)
-      {
-        b.remove(i);
-      }
+    {
+      b.remove(i);
+    }
   }
 
   for (int i = 0; i < e.size(); i++)
@@ -78,6 +96,11 @@ void draw()
     e.get(i).display();
     e.get(i).move();
     e.get(i).checkIfDead(); 
+
+    if (e.get(i).z > 100)
+    {
+      e.remove(i);
+    }
 
     if (e.get(i).killed)
     {
@@ -88,5 +111,5 @@ void draw()
 
 void mousePressed()
 {
-  b.add(new Bullet(crosshair, target));
+  b.add(new Bullet(start, target));
 }
