@@ -58,7 +58,7 @@ class Enemy
   {
     for (int i = 0; i < b.size(); i++)
     {
-      if (b.get(i).pos.z <= z && b.get(i).pos.z >= z - Depth && b.get(i).pos.x >= x && b.get(i).pos.x <= x + Width && b.get(i).pos.y >= y && b.get(i).pos.y <= y + Height)
+      if (b.get(i).pos.z >= z - Depth && b.get(i).pos.z <= z + Depth && b.get(i).pos.x >= x && b.get(i).pos.x <= x + Width && b.get(i).pos.y >= y && b.get(i).pos.y <= y + Height)
       {
         killed = true;
       }

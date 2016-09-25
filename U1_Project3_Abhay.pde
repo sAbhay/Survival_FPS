@@ -1,5 +1,7 @@
 import damkjer.ocd.*;
 
+PImage background;
+
 PVector crosshair;
 PVector target;
 PVector start;
@@ -12,7 +14,7 @@ float range = 5000;
 ArrayList<Bullet> b = new ArrayList<Bullet>();
 ArrayList<Enemy> e = new ArrayList<Enemy>();
 
-float sensitivity = 20;
+float sensitivity = 15;
 
 Camera camera;
 
@@ -26,12 +28,15 @@ void setup()
   camera = new Camera(this, start.x, start.y, start.z);
   camera.pan(PI/2);
   camera.tilt(PI/5);
+
+  background = loadImage("background.jpg");
+  background.resize((int) 8*width, (int) 8*height);
 }
 
 void draw()
 { 
   //camera.feed();
-  
+
   float d = dist(start.x, start.y, mouseX, mouseY)/sensitivity;
 
   crosshair = new PVector(mouseX, mouseY, 0);
@@ -44,6 +49,7 @@ void draw()
 
   background(0);
 
+
   pushMatrix();
   translate(width/2, height/2, -range/2);
   noFill();
@@ -51,10 +57,12 @@ void draw()
   box(width, height, range);
   popMatrix();
 
+
   pushMatrix();
   translate(0, 0, -range);
   fill(0, 255, 0);
-  rect(0, 0, width, height);
+  rect(-3.2*width, -3.2*height, 7.4*width, 7.4*height);
+  image(background, -3.2*width, -3.2*height);
   popMatrix();
 
   pushMatrix();
@@ -79,6 +87,10 @@ void draw()
     b.get(i).display();
     b.get(i).move();
     b.get(i).checkIfHit();
+
+    stroke(255, 0, 0);
+    line(b.get(i).pos.x, b.get(i).pos.y, b.get(i).pos.z, start.x, start.y, start.z);
+    stroke(255);
 
     if (b.get(i).pos.z < -(range))
     {
