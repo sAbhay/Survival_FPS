@@ -32,6 +32,7 @@ class Enemy
   {
     pushMatrix();
 
+    // Depth is the greater value between Width and Height
     if (Height > Width)
     {
       Depth = Width;

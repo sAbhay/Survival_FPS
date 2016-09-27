@@ -1,22 +1,18 @@
-import damkjer.ocd.*;
+PVector crosshair; // aim position
+PVector target; // target position
+PVector start; // bullet spawn position
 
-PImage background;
+float crosshairSize = 20; // size of complete reticule
+int cursorSize = 5; // size of aiming point
 
-PVector crosshair;
-PVector target;
-PVector start;
-
-float inaccuracy = 20;
-int cursorSize = 5;
-
-float range = 5000;
+float range = 5000; // furthest z possible
 
 ArrayList<Bullet> b = new ArrayList<Bullet>();
 ArrayList<Enemy> e = new ArrayList<Enemy>();
 
-float sensitivity = 15;
+float health = 100;
 
-Camera camera;
+float sensitivity = 15;
 
 void setup()
 {
@@ -24,18 +20,14 @@ void setup()
   noCursor();
 
   start = new PVector(width/2, height/2, 0);
-
-  camera = new Camera(this, start.x, start.y, start.z);
-  camera.pan(PI/2);
-  camera.tilt(PI/5);
-
-  background = loadImage("background.jpg");
-  background.resize((int) 8*width, (int) 8*height);
 }
 
 void draw()
 { 
-  //camera.feed();
+  if (health < 100)
+  {
+    health += 0.025;
+  }
 
   float d = dist(start.x, start.y, mouseX, mouseY)/sensitivity;
 
@@ -49,7 +41,7 @@ void draw()
 
   background(0);
 
-
+  //draws the edges of the space
   pushMatrix();
   translate(width/2, height/2, -range/2);
   noFill();
@@ -57,30 +49,27 @@ void draw()
   box(width, height, range);
   popMatrix();
 
-
-  pushMatrix();
-  translate(0, 0, -range);
-  fill(0, 255, 0);
-  rect(-3.2*width, -3.2*height, 7.4*width, 7.4*height);
-  image(background, -3.2*width, -3.2*height);
-  popMatrix();
-
-  pushMatrix();
-  translate(0, height -range);
-  rotateX(PI/2);
-  fill(0, 255, 0, 10);
-  rect(0, 0, width, range);
-  popMatrix();
-
+  //draws the crosshair
   noFill();
   pushMatrix();
   translate(0, 0, crosshair.z);
   ellipse(crosshair.x, crosshair.y, 5, 5);
-  rect(crosshair.x - cursorSize/2, crosshair.y + cursorSize*2, cursorSize, inaccuracy - cursorSize);
-  rect(crosshair.x - cursorSize/2, crosshair.y - inaccuracy - cursorSize, cursorSize, inaccuracy - cursorSize);
-  rect(crosshair.x - inaccuracy - cursorSize, crosshair.y - cursorSize/2, inaccuracy - cursorSize, cursorSize);
-  rect(crosshair.x + cursorSize*2, crosshair.y - cursorSize/2, inaccuracy - cursorSize, cursorSize);
+  rect(crosshair.x - cursorSize/2, crosshair.y + cursorSize*2, cursorSize, crosshairSize - cursorSize);
+  rect(crosshair.x - cursorSize/2, crosshair.y - crosshairSize - cursorSize, cursorSize, crosshairSize - cursorSize);
+  rect(crosshair.x - crosshairSize - cursorSize, crosshair.y - cursorSize/2, crosshairSize - cursorSize, cursorSize);
+  rect(crosshair.x + cursorSize*2, crosshair.y - cursorSize/2, crosshairSize - cursorSize, cursorSize);
   popMatrix();
+
+  //draws health bar
+  fill(255);
+  rect(50, 50, 200, 40);
+
+  fill(0, 255, 0);
+  rect(50, 50, health * 2, 40);
+
+  textSize(32);
+  fill(0);
+  text((int) health + "%", 160, 80);
 
   for (int i = 0; i < b.size(); i++)
   {
@@ -111,6 +100,8 @@ void draw()
 
     if (e.get(i).z > 100)
     {
+      health -= 20;
+
       e.remove(i);
     }
 
@@ -119,9 +110,15 @@ void draw()
       e.remove(i);
     }
   }
+
+  // closes app when game ends
+  if (health < 0)
+  {
+    exit();
+  }
 }
 
 void mousePressed()
 {
-  b.add(new Bullet(start, target));
+  b.add(new Bullet(start, target)); // add a new bullet starting at the center of the screen which aims towards the point the crosshair determines
 }
