@@ -1,3 +1,5 @@
+import damkjer.ocd.*;
+
 PVector crosshair; // aim position
 PVector target; // target position
 PVector start; // bullet spawn position
@@ -14,12 +16,19 @@ float health = 100;
 
 float sensitivity = 15;
 
+Camera camera;
+
 void setup()
 {
   fullScreen(P3D);
   noCursor();
 
   start = new PVector(width/2, height/2, 0);
+
+  camera = new Camera(this, 0, 0, 0, -range, -range , 0);
+
+  camera.pan(PI/2);
+  camera.tilt(PI/4.5);
 }
 
 void draw()
@@ -31,8 +40,13 @@ void draw()
 
   float d = dist(start.x, start.y, mouseX, mouseY)/sensitivity;
 
-  crosshair = new PVector(mouseX, mouseY, 0);
-  target = new PVector(width - crosshair.x, height - crosshair.y, range/d);
+  crosshair = new PVector(mouseX, mouseY, -1000);
+  target = new PVector(crosshair.x, crosshair.y, range);
+
+  camera.feed();
+
+  camera.truck(crosshair.x - pmouseX);
+  camera.boom(crosshair.y - pmouseY);
 
   if (e.size() < 10)
   {
@@ -78,7 +92,6 @@ void draw()
     b.get(i).checkIfHit();
 
     stroke(255, 0, 0);
-    line(b.get(i).pos.x, b.get(i).pos.y, b.get(i).pos.z, start.x, start.y, start.z);
     stroke(255);
 
     if (b.get(i).pos.z < -(range))
@@ -105,20 +118,25 @@ void draw()
       e.remove(i);
     }
 
-    if (e.get(i).killed)
+    if (i < 9)
     {
-      e.remove(i);
+      if (e.get(i).killed)
+      {
+        e.remove(i);
+      }
     }
   }
 
   // closes app when game ends
   if (health < 0)
   {
-    exit();
+    //exit();
   }
+  
+  println(health);
 }
 
 void mousePressed()
 {
-  b.add(new Bullet(start, target)); // add a new bullet starting at the center of the screen which aims towards the point the crosshair determines
+  b.add(new Bullet(crosshair, target)); // add a new bullet starting at the center of the screen which aims towards the point the crosshair determines
 }
